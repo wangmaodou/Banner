@@ -29,7 +29,6 @@ public class Banner extends View {
 
     public Banner(Context context){
         this(context,null);
-        //
     }
 
     public Banner(Context context, AttributeSet attributeSet){
