@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     Button mButton;
     Banner mBanner;
     Bitmap[] bitmaps;
+    int mClickCount=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +24,13 @@ public class MainActivity extends AppCompatActivity {
         mButton=(Button)findViewById(R.id.main_button);
 
         mBanner.setBitmaps(bitmaps);
+        mBanner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mClickCount=((Banner)view).getCurrentImageIndex();
+                mButton.setText(mClickCount+"");
+            }
+        });
         mButton.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {

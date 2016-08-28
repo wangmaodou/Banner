@@ -22,10 +22,10 @@ public class Banner extends View {
     private int mWidth,mHeight;
     private int mCurrentBitmapIndex=0;
     private ValueAnimator mAnimation;
-    private float mControlValue=0;
-    private boolean isRunning=false;
-    private long mStayTime=1500l;
-    private long mDuration=700l;
+    private float mControlValue=1;
+    private boolean isTouchable=false;
+    private long mStayTime=1200l;
+    private long mDuration=600l;
 
     public Banner(Context context){
         this(context,null);
@@ -61,6 +61,7 @@ public class Banner extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
         if (bitmaps==null){
             canvas.save();
             canvas.drawColor(Color.GRAY);
@@ -69,16 +70,16 @@ public class Banner extends View {
             drawBitmap(canvas,mControlValue);
         }
 
-        whenFinishAnimation();
+        //whenFinishAnimation();
     }
 
     private void drawBitmap(Canvas canvas,float percentage){
-        Bitmap lb=bitmaps[mCurrentBitmapIndex];
-        Bitmap rb;
-        if(mCurrentBitmapIndex==bitmaps.length-1) {
-            rb = bitmaps[0];
+        Bitmap lb;
+        Bitmap rb=bitmaps[mCurrentBitmapIndex];
+        if(mCurrentBitmapIndex==0) {
+            lb = bitmaps[bitmaps.length-1];
         }else {
-            rb=bitmaps[mCurrentBitmapIndex+1];
+            lb=bitmaps[mCurrentBitmapIndex-1];
         }
         if(lb!=null&&rb!=null)
             drawTwoBitmap(canvas,lb,rb,percentage);
@@ -104,20 +105,55 @@ public class Banner extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int slider=0;
+        float y=0;
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                y=event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                float dy=event.getY()-y;
+                if (dy<-100){
+                    slider=-1;
+                }else if(dy>100){
+                    slider=1;
+                }
+                Log.d("======","up========");
+                break;
+        }
+        dealWithTouch(slider);
         return super.onTouchEvent(event);
     }
 
+    private void dealWithTouch(int slider){
+
+        switch (slider){
+            case -1:
+
+                break;
+            case 1:
+
+                break;
+        }
+    }
+
     public void setBitmaps(Bitmap[] bs){
+
         this.bitmaps=bs;
     }
 
     public int getCurrentImageIndex(){
-        return mCurrentBitmapIndex;
+        if (isTouchable)
+            return mCurrentBitmapIndex;
+        return -1;
     }
 
     public void startScroll(){
 
         if (!mAnimation.isRunning()){
+            isTouchable=false;
             mAnimation.start();
         }
     }
@@ -131,6 +167,7 @@ public class Banner extends View {
                 mCurrentBitmapIndex++;
             }
             Log.d("=====END",mCurrentBitmapIndex+"////");
+
             postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -156,11 +193,25 @@ public class Banner extends View {
             @Override
             public void onAnimationStart(Animator animator) {
 
+                isTouchable=false;
+                if(mCurrentBitmapIndex==bitmaps.length-1){
+                    mCurrentBitmapIndex=0;
+                }else {
+                    mCurrentBitmapIndex++;
+                }
+
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
 
+                isTouchable=true;
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startScroll();
+                    }
+                },mStayTime);
             }
 
             @Override
@@ -170,6 +221,7 @@ public class Banner extends View {
 
             @Override
             public void onAnimationRepeat(Animator animator) {
+
             }
         });
         return va;
